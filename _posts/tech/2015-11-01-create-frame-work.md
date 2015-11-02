@@ -2,7 +2,7 @@
 layout: post
 title: 如何创建自己的frmawork
 category: 技术
-tags: PHP
+tags: iOS
 description: 创建自己的framework.
 ---
 
