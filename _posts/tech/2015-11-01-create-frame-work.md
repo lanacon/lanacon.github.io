@@ -11,6 +11,9 @@ description: 创建自己的framework.
 静态库和动态库的区别? 参考的文档链接
 
 简书上的文章
+
+[如何创建自己的framework ](http://www.jianshu.com/p/1cb4c4fe5481)
+
 容易出现的错误
 
 	1. Reason: image not found 错误解决方法
