@@ -24,10 +24,7 @@ avatar: http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg
 favicon: http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg
 
 # google analytics 设置
-ga:
-  id: UA-54767140-1
-  url: yansu.org
 
 # disqus 设置
 disqus:
-  shortname: suyan-zh
+  shortname: yinyakun-zh
