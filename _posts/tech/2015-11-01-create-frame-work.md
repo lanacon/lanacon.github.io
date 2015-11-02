@@ -2,11 +2,11 @@
 layout : post
 title : 如何创建自己的frmawork
 category :技术
-tags : iOS
+tags : PHP
 description: 创建自己的framework.
 ---
 
-#如何创建自己的framework
+###如何创建自己的framework
 
 静态库和动态库的区别? 参考的文档链接
 
