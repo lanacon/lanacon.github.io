@@ -1,8 +1,8 @@
 ---
-layout : post
-title : 如何创建自己的frmawork
-category :技术
-tags : PHP
+layout: post
+title: 如何创建自己的frmawork
+category: 技术
+tags: PHP
 description: 创建自己的framework.
 ---
 
