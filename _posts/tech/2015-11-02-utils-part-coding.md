@@ -1,9 +1,8 @@
 ---
 layout: post
-title: ios 中经常使用的代码片段
-tags: 代码片段 iOS
-catetory: 技术
-desctiption: ios 开发过程中经常使用到的代码片段.
+title: ios中经常使用的代码片段
+category: 技术
+description: ios 开发过程中经常使用到的代码片段.
 ---
 
 ### 通过event 找到tableview 上的某一个cell
