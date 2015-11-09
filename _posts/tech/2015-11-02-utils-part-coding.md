@@ -28,6 +28,7 @@ description: ios 开发过程中经常使用到的代码片段.
    	}
    	
 * 获取window 上当前最上面的控制器
+---
   		
 //获取当前屏幕显示的viewcontroller
     
@@ -62,6 +63,7 @@ description: ios 开发过程中经常使用到的代码片段.
 
 
 * 自定义一个view ,自定义样式,这里举例,类似聊天的小泡
+---
 ![效果图](http://ww3.sinaimg.cn/large/7f5ba233gw1exmru8ng1jj20hq0vkdg6.jpg)
 
 实现代码:
@@ -119,5 +121,43 @@ description: ios 开发过程中经常使用到的代码片段.
     CGContextDrawPath(context, kCGPathFill);
  
 	}
+	
+* 声音播放(播放背景音乐)
+---
+	#import<AVFoundation/AVFoundation.h>
+	@interface HMViewController ()
+	@property (nonatomic, assign) SystemSoundID soundID;
+	@end
+
+	@implementation HMViewController
+
+	- (void)viewDidLoad
+	{
+    [super viewDidLoad];
+    // 1.获得音效文件的全路径
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"normal.aac" withExtension:nil];
+    
+    // 2.加载音效文件, 创建音效ID（SoundID）
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &_soundID);
+    
+	}
+
+	- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+	{
+    // 3.播放
+    AudioServicesPlaySystemSound(_soundID);
+	}
+
+	@end
+
+
+分三步:
+
+1. 获取音效路径.NSURL * url;
+2. 加载音效文件.AudioServicesCreateSystemSoundID()(_bridge CFURLRef)url, &_soundID);
+3. 播放 AudioServicesPlaySystemSound(_soundID);
+
+
+
 
 * 陆续进行补充....
