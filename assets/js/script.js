@@ -54,21 +54,7 @@ $('#js-fullscreen').on('click', function() {
   }
 });
 
-$('#avatar').on('click', function() {
-  if (button.hasClass('fullscreen')) {
-    sidebar.removeClass('fullscreen');
-    button.removeClass('fullscreen');
-    content.delay(300).queue(function(){
-      $(this).removeClass('fullscreen').dequeue();
-    });
-  } else {
-    sidebar.addClass('fullscreen');
-    button.addClass('fullscreen');
-    content.delay(200).queue(function(){
-      $(this).addClass('fullscreen').dequeue();
-    });
-  }
-});
+
 
 
 $('#mobile-avatar').on('click', function(){
