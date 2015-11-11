@@ -38,7 +38,7 @@ $('.pl__all').on('click', function() {
 });
 
 // Enable fullscreen.
-$('#js-fullscreen').on('click', function() {
+$('#js-fullscreen','#avatar').on('click', function() {
   if (button.hasClass('fullscreen')) {
     sidebar.removeClass('fullscreen');
     button.removeClass('fullscreen');
