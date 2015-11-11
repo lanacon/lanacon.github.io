@@ -38,7 +38,7 @@ $('.pl__all').on('click', function() {
 });
 
 // Enable fullscreen.
-$('#js-fullscreen,#avatar').on('click', function() {
+$('#js-fullscreen').on('click', function() {
   if (button.hasClass('fullscreen')) {
     sidebar.removeClass('fullscreen');
     button.removeClass('fullscreen');
@@ -53,6 +53,23 @@ $('#js-fullscreen,#avatar').on('click', function() {
     });
   }
 });
+
+$('#avatar').on('click', function() {
+  if (button.hasClass('fullscreen')) {
+    sidebar.removeClass('fullscreen');
+    button.removeClass('fullscreen');
+    content.delay(300).queue(function(){
+      $(this).removeClass('fullscreen').dequeue();
+    });
+  } else {
+    sidebar.addClass('fullscreen');
+    button.addClass('fullscreen');
+    content.delay(200).queue(function(){
+      $(this).addClass('fullscreen').dequeue();
+    });
+  }
+});
+
 
 $('#mobile-avatar').on('click', function(){
   $('#sidebar, #pjax, #icon-arrow').addClass('fullscreen');
@@ -115,8 +132,8 @@ function afterPjax() {
       });
     });
   });
-
-  // Lazy Loading Disqus
+i
+  // Lazy Loading Disqs
   // http://jsfiddle.net/dragoncrew/SHGwe/1/
   var ds_loaded = false,
       top = $('#disqus_thread').offset().top;
