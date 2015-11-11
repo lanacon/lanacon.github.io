@@ -118,7 +118,6 @@ function afterPjax() {
       });
     });
   });
-i
   // Lazy Loading Disqs
   // http://jsfiddle.net/dragoncrew/SHGwe/1/
   var ds_loaded = false,
