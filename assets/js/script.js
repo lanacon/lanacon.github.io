@@ -18,7 +18,7 @@ var sidebar    = $('#sidebar'),
 
 // Tags switcher
 var clickHandler = function(id) {
-  return function() {
+  return function()i{
     $(this).addClass('active').siblings().removeClass('active');
     $('.pl__all').hide();
     $('.' + id).delay(50).fadeIn(350);
@@ -38,7 +38,7 @@ $('.pl__all').on('click', function() {
 });
 
 // Enable fullscreen.
-$('#js-fullscreen','#avatar').on('click', function() {
+$('#js-fullscreen,#avatar').on('click', function() {
   if (button.hasClass('fullscreen')) {
     sidebar.removeClass('fullscreen');
     button.removeClass('fullscreen');
