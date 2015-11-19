@@ -159,5 +159,29 @@ description: ios 开发过程中经常使用到的代码片段.
 
 
 
+# pod 卡到  cocospods老是卡在Analyzing dependencies~~
+
+更新的时候 试试用 :   pod install --verbose --no-repo-update 
+
+# Unable to satisfy the following requirements解决方案
+
+如果使用 pod install  的时候报错:
+
+[!] Unable to satisfy the following requirements:
+
+
+- `MJExtension` required by `Podfile`
+- `MJExtension (= 2.4.4)` required by `Podfile.lock`
+
+
+解决办法 
+
+先 更新
+
+pod update --verbose  --no-repo-update
+
+然后 再
+
+pod install --verbose --no-repo-update
 
 * 陆续进行补充....

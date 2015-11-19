@@ -1,5 +1,8 @@
 permalink: /:year/:month/:day/:title.html
-markdown: markdown
+markdown:      maruku
+markdown_ext:  markdown,mkd,mkdn,md
+textile_ext:   textile
+
 pygments: true
 
 kramdown:
@@ -29,5 +32,33 @@ favicon: http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg
 disqus:
 shortname: yinyakun-zh
 
-host: 127.0.0.1
-port: 4000
+excerpt_separator: "\n\n"
+
+safe:        false
+watch:       false    # deprecated
+server:      false    # deprecated
+host:        0.0.0.0
+port:        4000
+baseurl:     /
+url:         http://localhost:4000
+lsi:         false
+
+
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  use_coderay: false
+
+  coderay:
+    coderay_wrap: div
+    coderay_line_numbers: inline
+    coderay_line_numbers_start: 1
+    coderay_tab_width: 4
+    coderay_bold_every: 10
+    coderay_css: style
+
+redcloth:
+  hard_breaks: true
