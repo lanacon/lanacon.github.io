@@ -159,11 +159,12 @@ description: ios 开发过程中经常使用到的代码片段.
 
 
 
-# pod 卡到  cocospods老是卡在Analyzing dependencies~~
+__ pod 卡到  cocospods老是卡在Analyzing dependencies~~ __
 
 更新的时候 试试用 :   pod install --verbose --no-repo-update 
 
-# Unable to satisfy the following requirements解决方案
+
+__ Unable to satisfy the following requirements解决方案 __
 
 如果使用 pod install  的时候报错:
 
