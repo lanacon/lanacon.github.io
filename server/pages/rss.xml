@@ -1,0 +1,1312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>尹亚坤的博客</title>
+    <link>http://localhost:4000</link>
+    <description>尹亚坤的博客</description>
+    
+      <item>
+        <title>CoreData 技术</title>
+        <link>http://localhost:4000/2015/11/17/coredata-sample.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/17/coredata-sample.html</guid>
+        <pubDate>2015-11-17 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;CoreData 实际上是对 sqlite 的封装.&lt;/p&gt;
+
+&lt;p&gt;例子说明:现在有一个选择课程的功能,课程有方向.&lt;/p&gt;
+
+&lt;p&gt;比如说: 前端 是一个方向,后台是一个方向.前端的课程有css,js,ios,android.后台的方向有java,c#,php.&lt;/p&gt;
+
+&lt;p&gt;表格如下:&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;前台&lt;/th&gt;&lt;th&gt;后台&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td style=&#39;text-align: left;&#39;&gt;css&lt;/td&gt;&lt;td style=&#39;text-align: left;&#39;&gt;java&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;text-align: left;&#39;&gt;javascript&lt;/td&gt;&lt;td style=&#39;text-align: left;&#39;&gt;php&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;text-align: left;&#39;&gt;iOS&lt;/td&gt;&lt;td style=&#39;text-align: left;&#39;&gt;c#&lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;现在我们对前台/后台进行增删改查.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;(1)向前台的课程中添加一个 android  ,想后台的里面添加一个 python.
+
+(2)查询出前台的所有课程,和后台的所有课程.
+
+(3) 修改 后台课程中的c#  为 C#
+
+(4) 删除前台中的 css 课程.&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;分析上面的例子 ,发现 ,前台可以有多个课程,但是一个课程只能属于一个方向(不考虑特殊情况.),那么他们是一对多的关系.&lt;/p&gt;
+
+&lt;p&gt;1. 创建空工程. 2. 创建一个单例,CoreData 的增删改查.&lt;/p&gt;
+
+&lt;p&gt;3. 单例源码:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	//
+	#import &amp;quot;SignleCoreData.h&amp;quot;
+	@interface SignleCoreData ()
+	@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
+		@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
+
+	@end
+
+	@implementation SignleCoreData
+	#pragma mark - Core Data stack
+
+	@synthesize managedObjectContext = _managedObjectContext;
+	@synthesize managedObjectModel = _managedObjectModel;
+	@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+	+ (SignleCoreData *)shareCoreData
+	{
+	static SignleCoreData * identifier = nil;   
+	static dispatch_once_t onceToken;
+			dispatch_once(&amp;amp;onceToken, ^{
+    if (identifier == nil) {
+        identifier = [[SignleCoreData alloc] init];
+    }
+      });
+         return identifier;
+	}
+
+			- (instancetype)init
+	{
+		self = [super init];
+			if (self) {
+    [self managedObjectContext];
+    
+    NSLog(@&amp;quot;%@&amp;quot;,[self applicationDocumentsDirectory]);
+    
+    }
+    return self;
+    }
+    
+	- (NSURL *)applicationDocumentsDirectory {
+	// The directory the application uses to store the Core Data store file. This code uses a directory named &amp;quot;nationsky.CoreDataSample&amp;quot; in the application&amp;#39;s documents directory.
+	return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+	}
+
+	- (NSManagedObjectModel *)managedObjectModel {
+    // The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.
+    if (_managedObjectModel != nil) {
+    return _managedObjectModel;
+    }
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@&amp;quot;Model&amp;quot; withExtension:@&amp;quot;momd&amp;quot;];
+    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    return _managedObjectModel;
+	}
+
+	- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
+    // The persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it.
+    if (_persistentStoreCoordinator != nil) {
+    return _persistentStoreCoordinator;
+    }
+
+
+
+	#pragma mark -------------------ka----------------s
+
+    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+                         [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+                         [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+
+
+	#pragma mark -------------------jie----------------s
+
+
+    	// Create the coordinator and store
+
+	    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+	    
+	    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@&amp;quot;CoreDataSample.sqlite&amp;quot;];
+    NSError *error = nil;
+    NSString *failureReason = @&amp;quot;There was an error creating or loading the application&amp;#39;s saved data.&amp;quot;;
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&amp;amp;error]) {
+    // Report any error we got.
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    dict[NSLocalizedDescriptionKey] = @&amp;quot;Failed to initialize the application&amp;#39;s saved data&amp;quot;;
+    dict[NSLocalizedFailureReasonErrorKey] = failureReason;
+    dict[NSUnderlyingErrorKey] = error;
+    error = [NSError errorWithDomain:@&amp;quot;YOUR_ERROR_DOMAIN&amp;quot; code:9999 userInfo:dict];
+    // Replace this with code to handle the error appropriately.
+    // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+    NSLog(@&amp;quot;Unresolved error %@, %@&amp;quot;, error, [error userInfo]);
+    abort();
+    }
+
+       return _persistentStoreCoordinator;
+	}
+
+
+	- (NSManagedObjectContext *)managedObjectContext {
+    // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
+    if (_managedObjectContext != nil) {
+    return _managedObjectContext;
+    }
+
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (!coordinator) {
+    return nil;
+    }
+    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    return _managedObjectContext;
+	}
+
+	#pragma mark - Core Data Saving support
+
+	- (void)saveContext {
+    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
+    if (managedObjectContext != nil) {
+    NSError *error = nil;
+    if ([managedObjectContext hasChanges] &amp;amp;&amp;amp; ![managedObjectContext save:&amp;amp;error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@&amp;quot;Unresolved error %@, %@&amp;quot;, error, [error userInfo]);
+        abort();
+    }
+    }
+	}
+	}&lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>工作中的点滴.</title>
+        <link>http://localhost:4000/2015/11/13/%E5%B7%A5%E4%BD%9C%E7%82%B9%E6%BB%B4.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/13/%E5%B7%A5%E4%BD%9C%E7%82%B9%E6%BB%B4.html</guid>
+        <pubDate>2015-11-13 00:00:00 +0800</pubDate>
+        <description>&lt;h3 id=&#39;id101&#39;&gt;自己的未来&lt;/h3&gt;
+
+&lt;p&gt;这周工作很不顺利.心里也很不舒服.总想对谁说点什么,但是又不知道说什么.&lt;/p&gt;
+
+&lt;p&gt;展望一下自己的未来,审视一下自己的过去,&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>iOS GCD 技术系列1</title>
+        <link>http://localhost:4000/2015/11/09/GCD_%E7%B3%BB%E5%88%97.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/09/GCD_%E7%B3%BB%E5%88%97.html</guid>
+        <pubDate>2015-11-09 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;多线程编程的缺点:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; * 数据不一致 数据竞争 (对数据进行加锁.)
+ * 停止等待事件的线程会导致多个线程相互持续等待(死锁,A线程需要B 线程中的资源,B)
+ * 使用太多线程会消耗大量内存.&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;多线程的优点:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; * 可以保证应用程序的响应性.&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;什么是GCD?&lt;/p&gt;
+
+&lt;p&gt;苹果官方: 异步执行任务的的技术之一.&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;GCD 模板&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	dispatch_async(queue,^{
+
+/*
+
+* 长时间处理的任务,例如数据库访问
+
+*/
+
+/*
+
+* 长时间处理结束,主线程使用处理好的结果.
+
+*/
+dispatch_asyn(dispatch_get_main_queue(),^{
+
+/* 
+
+* 只有在主线程才能操作的处理
+
+\* 如更新UI.
+
+*/
+});
+
+});&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在导入GCD 之前,cocoa 框架提供了 NSObject 类的performSelectorInBackground:withObject 实例方法和performSelectorOnMainThread 实例方法等简单的多线程编程技术.如:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//
+- (void)otherThreadTodoWork
+{
+	[self preformSelectorInBackground:@selector:(doWork) 		withObject:nil];
+}
+
+/*
+* 后台线程处理方法
+*/
+- (void)doWork
+{
+	/*
+	* 长时间处理,例如数据库操作.
+	*/
+	
+	/*
+	*处理完成以后,主线程使用处理的结果.
+	*/
+	
+	[self performSelectorOnMainThread:@selector(reloadView) withObject:nil waitUntilDone:NO];
+}
+
+/*
+* 主线程处理方法
+*/
+
+- (void)reloadView
+{
+	
+	//只在主线程中执行的处理.
+	
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&amp;#8230;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;GCD 的种类 dispatch_queue&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Serial (单线程),conCurrent(并发执行,多线程);&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;使用serial 这种类型,每个线程中可以加入多个任务,每个任务是排队执行的,按照加入的先后顺序,任务1 执行完 执行任务2&amp;#8230;,在queue 中只有一个 线程 在执行&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;conCurrent 是并发执行,把任务加入到线程中,多可线程同时执行.苹果系统内部会根据自己系统当前的资源进行分配线程个数.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;4. 实例.&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>测试</title>
+        <link>http://localhost:4000/2015/11/02/%E6%8F%90%E4%BA%A4%E4%BA%BA.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/02/%E6%8F%90%E4%BA%A4%E4%BA%BA.html</guid>
+        <pubDate>2015-11-02 00:00:00 +0800</pubDate>
+        <description>&lt;h1 id=&#39;id100&#39;&gt;测试使用&lt;/h1&gt;
+
+&lt;p&gt;hello&lt;/p&gt;
+
+&lt;p&gt;world&lt;/p&gt;
+
+&lt;p&gt;test.&lt;/p&gt;
+
+&lt;p&gt;ceshi ceshi&lt;/p&gt;
+
+&lt;p&gt;ceshi&lt;/p&gt;
+
+&lt;p&gt;hello wrold!&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>多态</title>
+        <link>http://localhost:4000/2015/11/02/%E5%A4%9A%E6%80%81.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/02/%E5%A4%9A%E6%80%81.html</guid>
+        <pubDate>2015-11-02 00:00:00 +0800</pubDate>
+        <description>&lt;h1 id=&#39;id99&#39;&gt;多态&lt;/h1&gt;
+
+&lt;p&gt;什么多态: 对象的多种形态.&lt;/p&gt;
+
+&lt;p&gt;用父类的指针指向 子类对象.&lt;/p&gt;
+
+&lt;p&gt;动态绑定,&lt;/p&gt;
+
+&lt;p&gt;多态 的用途 :&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>ios中经常使用的代码片段</title>
+        <link>http://localhost:4000/2015/11/02/utils-part-coding.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/02/utils-part-coding.html</guid>
+        <pubDate>2015-11-02 00:00:00 +0800</pubDate>
+        <description>&lt;h3 id=&#39;event_tableview_cell&#39;&gt;通过event 找到tableview 上的某一个cell&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;	-(void)didclickBtn_edit:(UIButton *)sender event:(UIEvent *)event
+
+		{
+
+UITouch *touch = [[event allTouches] anyObject];
+
+CGPoint currentTouchPosition = [touch locationInView:self.tableview_showdata];
+
+NSIndexPath *indexPath = [self.tableview_showdata indexPathForRowAtPoint: currentTouchPosition];
+
+if (indexPath != nil)
+
+{
+
+    NSLog(@&amp;quot;%ld,%ld&amp;quot;,indexPath.row,indexPath.section);
+
+}
+}
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;h2 id=&#39;window_&#39;&gt;获取window 上当前最上面的控制器&lt;/h2&gt;
+
+&lt;p&gt;//获取当前屏幕显示的viewcontroller&lt;/p&gt;
+
+&lt;p&gt;- (UIViewController &lt;em&gt;)getCurrentVC { UIViewController&lt;/em&gt;result = nil;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	 UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    if (window.windowLevel != UIWindowLevelNormal)
+ 	 {
+      	NSArray *windows = [[UIApplication sharedApplication] windows];
+    	  for(UIWindow * tmpWin in windows)
+      	{
+          	if (tmpWin.windowLevel == UIWindowLevelNormal)
+         	 {
+            	  window = tmpWin;
+             	 break;
+      }
+  }&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;}&lt;/p&gt;
+
+&lt;p&gt;UIView &lt;em&gt;frontView = &lt;span&gt;&lt;span&gt;window subviews&lt;/span&gt; objectAtIndex:0&lt;/span&gt;; id nextResponder = &lt;span&gt;frontView nextResponder&lt;/span&gt;;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;if (&lt;span&gt;nextResponder isKindOfClass:&lt;span&gt;UIViewController class&lt;/span&gt;&lt;/span&gt;) result = nextResponder; else result = window.rootViewController;&lt;/p&gt;
+
+&lt;p&gt;return result; }&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;h2 id=&#39;view_&#39;&gt;自定义一个view ,自定义样式,这里举例,类似聊天的小泡&lt;/h2&gt;
+
+&lt;p&gt;&lt;img alt=&#39;效果图&#39; src=&#39;http://ww3.sinaimg.cn/large/7f5ba233gw1exmru8ng1jj20hq0vkdg6.jpg&#39; /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;实现代码:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#import &amp;quot;YKPopView.h&amp;quot;
+
+#define MENUGAP 7
+
+@implementation YKPopView
+
+-(instancetype)initWithFrame:(CGRect)frame {
+self = [super initWithFrame:frame];
+if (self) {
+    self.backgroundColor = [UIColor clearColor];
+}
+return self;
+}
+
+// Only override drawRect: if you perform custom drawing.
+	// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+// Drawing code
+CGFloat width = rect.size.width;
+CGFloat height = rect.size.height;
+CGFloat radius = 3;
+ 
+// 获取CGContext，注意UIKit里用的是一个专门的函数
+CGContextRef context = UIGraphicsGetCurrentContext();
+// 移动到初始点
+CGContextMoveToPoint(context, radius, MENUGAP);
+ 
+// 绘制第1条线和第1个1/4圆弧
+CGContextAddLineToPoint(context, width * 5/6 - 6,MENUGAP);
+CGContextAddLineToPoint(context, width * 5/6,0);
+CGContextAddLineToPoint(context, width  * 5/6 + 6,MENUGAP);
+CGContextAddLineToPoint(context, width - radius, MENUGAP);
+CGContextAddArc(context, width - radius, radius + MENUGAP, radius, -0.5 * M_PI, 0.0, 0);
+ 
+// 绘制第2条线和第2个1/4圆弧
+CGContextAddLineToPoint(context, width, height - radius - MENUGAP);
+CGContextAddArc(context, width - radius, height - radius - MENUGAP, radius, 0.0, 0.5 * M_PI, 0);
+ 
+// 绘制第3条线和第3个1/4圆弧
+CGContextAddLineToPoint(context, radius, height - MENUGAP);
+CGContextAddArc(context, radius, height - radius - MENUGAP, radius, 0.5 * M_PI, M_PI, 0);
+ 
+// 绘制第4条线和第4个1/4圆弧
+CGContextAddLineToPoint(context, 0, radius + MENUGAP);
+CGContextAddArc(context, radius, radius + MENUGAP, radius, M_PI, 1.5 * M_PI, 0);
+ 
+// 闭合路径
+CGContextClosePath(context);
+ 
+[[UIColor redColor] setFill];
+CGContextDrawPath(context, kCGPathFill);
+
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#39;_&#39;&gt;* 声音播放(播放背景音乐)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;#import&amp;lt;AVFoundation/AVFoundation.h&amp;gt;
+@interface HMViewController ()
+@property (nonatomic, assign) SystemSoundID soundID;
+@end
+
+@implementation HMViewController
+
+- (void)viewDidLoad
+{
+[super viewDidLoad];
+// 1.获得音效文件的全路径
+NSURL *url = [[NSBundle mainBundle] URLForResource:@&amp;quot;normal.aac&amp;quot; withExtension:nil];
+
+// 2.加载音效文件, 创建音效ID（SoundID）
+AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &amp;amp;_soundID);
+
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+// 3.播放
+AudioServicesPlaySystemSound(_soundID);
+}
+
+@end&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;分三步:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;获取音效路径.NSURL * url;&lt;/li&gt;
+
+&lt;li&gt;加载音效文件.AudioServicesCreateSystemSoundID()(_bridge CFURLRef)url, &amp;amp;_soundID);&lt;/li&gt;
+
+&lt;li&gt;播放 AudioServicesPlaySystemSound(_soundID);&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;__ pod 卡到 cocospods老是卡在Analyzing dependencies~~ __&lt;/p&gt;
+
+&lt;p&gt;更新的时候 试试用 : pod install &amp;#8211;verbose &amp;#8211;no-repo-update&lt;/p&gt;
+
+&lt;p&gt;__ Unable to satisfy the following requirements解决方案 __&lt;/p&gt;
+
+&lt;p&gt;如果使用 pod install 的时候报错:&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;!&lt;/span&gt; Unable to satisfy the following requirements:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;MJExtension&lt;/code&gt; required by &lt;code&gt;Podfile&lt;/code&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;code&gt;MJExtension (= 2.4.4)&lt;/code&gt; required by &lt;code&gt;Podfile.lock&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;解决办法&lt;/p&gt;
+
+&lt;p&gt;先 更新&lt;/p&gt;
+
+&lt;p&gt;pod update &amp;#8211;verbose &amp;#8211;no-repo-update&lt;/p&gt;
+
+&lt;p&gt;然后 再&lt;/p&gt;
+
+&lt;p&gt;pod install &amp;#8211;verbose &amp;#8211;no-repo-update&lt;/p&gt;
+
+&lt;p&gt;* 陆续进行补充&amp;#8230;.&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>C 语言基础</title>
+        <link>http://localhost:4000/2015/11/02/c%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0..html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/02/c%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0..html</guid>
+        <pubDate>2015-11-02 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;c&#39;&gt;C语言学习.&lt;/h2&gt;
+
+&lt;p&gt;mac 下编译C 语言方法:&lt;/p&gt;
+
+&lt;p&gt;打开: 终端,进入到文件所在的文件夹,然后编译, &lt;strong&gt;&lt;em&gt;cc - c hello.c&lt;/em&gt;&lt;/strong&gt; 会在当前文件中生成.o 的文件, 该文件为编译生成的中间文件, 然后 可以输入 &lt;strong&gt;&lt;em&gt;cc hello.o&lt;/em&gt;&lt;/strong&gt; 进行链接, 链接成功后生成a.out 文件. 文件中目录如下: &lt;img alt=&#39;文件目录&#39; src=&#39;http://ww4.sinaimg.cn/large/7f5ba233gw1exnkwppevkj20bo07uglt.jpg&#39; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如果想执行a.out 则可以 &lt;strong&gt;&lt;em&gt;./a.out&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;如果是OC 的.m 文件,和C 语言一样.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;touch OC_First.m &lt;img alt=&#39;内容&#39; src=&#39;http://ww2.sinaimg.cn/large/7f5ba233gw1exnl8vlbfqj20gw094gme.jpg&#39; /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;2. 在这一步如果头文件没有引入会报错: &lt;img alt=&#39;报错文件&#39; src=&#39;http://ww3.sinaimg.cn/large/7f5ba233gw1exnlabua2qj210m066ad9.jpg&#39; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;这说明 NSLog 方法没有找到 ,根据提示,需要包含 提示的头文件.    	&amp;lt;Foundation/NSObjCRuntime.h&amp;gt;
+根据提示,把头文件包含后,在编译:
+报错:![](http://ww2.sinaimg.cn/large/7f5ba233gw1exnlf2n4uvj20zw066gp0.jpg)
+
+解决办法 :  把  Foundataion 的整个框架  引进来.
+
+cc -OC_Fist.o -framework Foundation&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;运行 生成 的 ./a.out 文件,success.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;最后总结 流程: ******* 1. 编写 .c 或者 XXX.m 文件,&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;编译 cc -c XXX.m 生成 XXX.o文件&lt;/li&gt;
+
+&lt;li&gt;链接 cc XXX.o 生成 a.out.&lt;/li&gt;
+
+&lt;li&gt;运行 ./a.out *******&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果现在 有两个文件, 一个 是 OC_First.m 一个是 OC_Second.m 如果第一个 文件中调用了第二个文件里面的方法, 那么需要第一个文件里面引用第二个文件的头文件. 新建一个 OC_Second.h 文件. 第一个文件中包含OC_Second.h 文件.&lt;/p&gt;
+
+&lt;p&gt;然后,分别编译 两个文件 分别生成 OC_First.o 和 OC_Second.o&lt;/p&gt;
+
+&lt;p&gt;然后链接这两个文件 : &lt;strong&gt;&lt;em&gt;cc OC_First.o OC_Second.o -framework Foundation&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;两个文件中得代码:&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt=&#39;文件内容&#39; src=&#39;http://ww4.sinaimg.cn/large/7f5ba233gw1exnm6vo3qpj212c0d0q6m.jpg&#39; /&gt;&lt;/p&gt;
+
+&lt;p&gt;运行的结果 :&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt=&#39;结果&#39; src=&#39;http://ww3.sinaimg.cn/large/7f5ba233gw1exnm7zddbej20qo01y0u2.jpg&#39; /&gt;&lt;/p&gt;
+
+&lt;p&gt;链接两个文件的方法:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;编写 a.m , b.m , b.h 三个文件&lt;/li&gt;
+
+&lt;li&gt;a.m 中引入 b.h 头文件&lt;/li&gt;
+
+&lt;li&gt;分别链接 两个.m 文件 cc -c a.m ,cc -c b.m 生成 a.o , b.o 4. &lt;strong&gt;&lt;em&gt;cc OC_First.o OC_Second.o -framework Foundation&lt;/em&gt;&lt;/strong&gt;&lt;/li&gt;
+
+&lt;li&gt;最后执行生成的a.out 文件.&lt;/li&gt;
+&lt;/ol&gt;</description>
+      </item>
+    
+      <item>
+        <title>生活第一篇</title>
+        <link>http://localhost:4000/2015/11/01/%E7%94%9F%E6%B4%BB.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/01/%E7%94%9F%E6%B4%BB.html</guid>
+        <pubDate>2015-11-01 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;干的就是这份工作,何必成天要抱怨呢?&lt;/p&gt;
+
+&lt;p&gt;做好份内的事,老老实实的把技术给弄好 &amp;#8230;&lt;/p&gt;
+
+&lt;p&gt;客户提出需求,干吗急着否定,耐心 ,再 耐心&amp;#8230;&lt;/p&gt;
+
+&lt;p&gt;提一个bug ,就 急的 跟什么似得,那显得自己不成熟&amp;#8230;&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>markdown 经常使用的命令</title>
+        <link>http://localhost:4000/2015/11/01/markdown_%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/01/markdown_%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html</guid>
+        <pubDate>2015-11-01 00:00:00 +0800</pubDate>
+        <description>&lt;h4 id=&#39;markdown_&#39;&gt;markdown 常用的命令&lt;/h4&gt;
+
+&lt;p&gt;1. 代码块:四个空格一个制表符.&lt;/p&gt;
+
+&lt;p&gt;2. 引用别人的话: &amp;gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;mou 中快速查看markdown 语法快捷键: cmd + R&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;4.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;First Header | Second Header | Third Header
+------------ | ------------- | ------------
+Content Cell | Content Cell  | Content Cell
+Content Cell | Content Cell  | Content Cell
+
+如果是表格就复制一个表格然后复制粘贴吧.&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;5.&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>mac 常用命令</title>
+        <link>http://localhost:4000/2015/11/01/mac_%E4%B8%8B%E5%B8%B8%E4%BD%BF%E7%94%A8%E7%9A%84%E7%BB%88%E7%AB%AF%E5%91%BD%E4%BB%A4.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/01/mac_%E4%B8%8B%E5%B8%B8%E4%BD%BF%E7%94%A8%E7%9A%84%E7%BB%88%E7%AB%AF%E5%91%BD%E4%BB%A4.html</guid>
+        <pubDate>2015-11-01 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id96&#39;&gt;显示隐藏文件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;显示文件夹 : defaults write com.apple.finder AppleShowAllFiles -bool true&lt;/li&gt;
+
+&lt;li&gt;隐藏 文件夹：defaults write com.apple.finder AppleShowAllFiles -bool false&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#39;id97&#39;&gt;给文件开权限.&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;sudo chmod -R 0777 file_url //file_url 为文件路径&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#39;id98&#39;&gt;查看当前用户数/组.&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;dscl . -list /Users //查看用户&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;decl . -list /Group //查看群组&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;dscl . -list /Groups GroupMembership //查看用户对应的群组关系.&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;whoami //查看当前用户&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description>
+      </item>
+    
+      <item>
+        <title>如何创建自己的frmawork</title>
+        <link>http://localhost:4000/2015/11/01/create-frame-work.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/01/create-frame-work.html</guid>
+        <pubDate>2015-11-01 00:00:00 +0800</pubDate>
+        <description>&lt;h3 id=&#39;framework&#39;&gt;如何创建自己的framework&lt;/h3&gt;
+
+&lt;p&gt;静态库和动态库的区别? 参考的文档链接&lt;/p&gt;
+
+&lt;p&gt;简书上的文章&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#39;http://www.jianshu.com/p/1cb4c4fe5481&#39;&gt;如何创建自己的framework&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;容易出现的错误&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1. Reason: image not found 错误解决方法
+dyld: Library not loaded: /System/Library/Frameworks/
+Social.framework/Social
+Referenced from: /var/mobile/Applications/      00D3E0A7-4FF6-451E-	B11C-87D7A189F425/sample.app/    sample
+Reason: image not found
+
+把Build Phases 里Social.framework后边的选项修改成为  Optional就可以了
+
+2. Xcode “Missing Submodule” warning
+
+一句话:
+如果把framework 放到工程中,有这个黄色的警告:就把framework 中暴露出来的.h 文件都添加到自动生成的.h文件中.
+
+I ran into the same problem and eventually fixed it by adding my project headers into the umbrella header. When you create a new framework it should start with a single .h file titled by the project (in your case DirectProximityFramework.h).
+
+Inside this file is a comment:
+
+In this header, you should import all the public headers of your framework using statements like #import &amp;lt;DirectProximityFramework/PublicHeader.h&amp;gt;
+So just add your GeofencingHelper.h file in this file:
+
+\#import &amp;lt;DirectProximityFramework/GeofencingHelper.h&amp;gt;
+This should remove all of your warnings!
+3.xcode 如果添加的是动态库可能会需要在这个地方添加一个到项目中
+
+点击加号,把自己的framework 添加到工程中来.
+This page was generated by GitHub Pages using the Cayman theme by Jason Long. &lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>Vim 常用资源</title>
+        <link>http://localhost:4000/2015/10/04/general-vim-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/10/04/general-vim-resources.html</guid>
+        <pubDate>2015-10-04 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id94&#39;&gt;在粘贴代码时不启动自动缩进&lt;/h2&gt;
+
+&lt;p&gt;粘贴之前输入 &lt;code&gt;:set paste&lt;/code&gt; 粘贴完后恢复 &lt;code&gt;:set nopaste&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&#39;id95&#39;&gt;关闭和开启行号&lt;/h2&gt;
+
+&lt;p&gt;关闭 &lt;code&gt;:set nonu&lt;/code&gt; 开启 &lt;code&gt;:set number&lt;/code&gt;&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>SEO 常用资源</title>
+        <link>http://localhost:4000/2015/02/13/general-seo-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/02/13/general-seo-resources.html</guid>
+        <pubDate>2015-02-13 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id93&#39;&gt;小技巧&lt;/h2&gt;
+
+&lt;h3 id=&#39;url&#39;&gt;URL中用&lt;code&gt;-&lt;/code&gt;分割单词，用&lt;code&gt;_&lt;/code&gt;关联单词&lt;/h3&gt;
+
+&lt;p&gt;Google 会把 &lt;code&gt;a-good_reource-of-seo.html&lt;/code&gt; 拆分成关键字：&lt;code&gt;a&lt;/code&gt;, &lt;code&gt;good_resource&lt;/code&gt;, &lt;code&gt;of&lt;/code&gt; 和 &lt;code&gt;seo&lt;/code&gt;。&lt;/p&gt;</description>
+      </item>
+    
+      <item>
+        <title>Mac 常用资源</title>
+        <link>http://localhost:4000/2014/08/03/general-mac-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/08/03/general-mac-resources.html</guid>
+        <pubDate>2014-08-03 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id89&#39;&gt;常用软件&lt;/h2&gt;
+
+&lt;h3 id=&#39;alfred&#39;&gt;Alfred&lt;/h3&gt;
+
+&lt;h4 id=&#39;alfredworkflow&#39;&gt;Alfred常用Workflow&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#39;http://kapeli.com/dash&#39;&gt;Dash&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;https://github.com/liberize/alfred-dict-workflow&#39;&gt;Dict - Lookup Word&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;http://www.alfredforum.com/topic/917-reminders/&#39;&gt;Reminders&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;http://support.alfredapp.com/evernote&#39;&gt;Evernote&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;http://www.alfredforum.com/topic/1009-notes/&#39;&gt;Notes&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#39;id90&#39;&gt;常用命令&lt;/h2&gt;
+
+&lt;h3 id=&#39;dashboard&#39;&gt;开启关闭dashboard&lt;/h3&gt;
+
+&lt;p&gt;关闭&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;defaults write com.apple.dashboard mcx-disabled -boolean YES
+killall Dock&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;开启&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;defaults write com.apple.dashboard mcx-disabled -boolean NO
+killall Dock&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id91&#39;&gt;剪贴板操作&lt;/h3&gt;
+
+&lt;p&gt;写入剪切板&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo &amp;#39;test&amp;#39; &amp;gt; pbcopy 
+cat testfile &amp;gt; pbcopy&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;读取剪贴板&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pbpaste &amp;gt; testfile
+pbpaste | cat&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;hidpi&#39;&gt;开启关闭Hidpi&lt;/h3&gt;
+
+&lt;p&gt;开启&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool YES&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;关闭&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo defaults delete /Library/Preferences/com.apple.windowserver DisplayResolutionDisabled&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;dock&#39;&gt;修改Dock隐藏和出现时间&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+defaults write com.apple.dock autohide-delay -int 0
+defaults write com.apple.dock autohide-time-modifier -float 0.4
+killall Dock
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&#39;itermoptionaltmeta&#39;&gt;设置iterm中option为alt(meta)键&lt;/h3&gt;
+
+&lt;p&gt;&lt;img alt=&#39;option-to-meta&#39; src=&#39;http://7u2ho6.com1.z0.glb.clouddn.com/resource-set-meta-to-alt.png&#39; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#39;dropbox&#39;&gt;删除dropbox冲突文件&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;find . -type f -name &amp;quot;* conflicted *&amp;quot; -exec rm -f {} \;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;launchpad&#39;&gt;清空Launchpad（删除掉）&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;sqlite3 ~/Library/Application\ Support/Dock/*.db &amp;#39;DELETE FROM apps;&amp;#39; &amp;amp;&amp;amp; killall Dock&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;launchpad&#39;&gt;重置Launchpad&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;rm -f ~/Library/Application\ Support/Dock/*.db &amp;amp;&amp;amp; killall Dock&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;finder&#39;&gt;修改Finder中文件夹显示语言&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;# 以Desktop为例
+touch ~/Desktop/.localized
+chmod 600 ~/Desktop/.localized&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#39;id92&#39;&gt;常用快捷键&lt;/h2&gt;
+
+&lt;h3 id=&#39;chrome&#39;&gt;Chrome&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;切换用户 &lt;code&gt;Command + shift + M&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+      </item>
+    
+      <item>
+        <title>MySQL常用资源</title>
+        <link>http://localhost:4000/2014/05/11/general-mysql-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/05/11/general-mysql-resources.html</guid>
+        <pubDate>2014-05-11 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id81&#39;&gt;常用命令&lt;/h2&gt;
+
+&lt;h3 id=&#39;id82&#39;&gt;登录数据库&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;mysql -h localhost -uroot -p&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id83&#39;&gt;导出数据库&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;mysqldump -uroot -p db &amp;gt; db.sql&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id84&#39;&gt;导入数据库&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;mysql -uroot -p db &amp;lt; db.sql
+// or
+mysql -uroot -p db -e &amp;quot;source /path/to/db.sql&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id85&#39;&gt;开启远程登录&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;grant all privileges on ss.* to &amp;#39;root&amp;#39;@&amp;#39;%&amp;#39; indentified by &amp;#39;passoword&amp;#39; with grant option;
+// or 
+update user set Host=&amp;quot;%&amp;quot; and User=&amp;quot;root&amp;quot;
+// 注意%是不包含localhost的
+flush privileges;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id86&#39;&gt;创建用户&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;CREATE USER &amp;#39;test&amp;#39;@&amp;#39;localhost&amp;#39; IDENTIFIED BY &amp;#39;password&amp;#39;;
+grant all privileges on *.* to test@&amp;#39;localhost&amp;#39; identified by &amp;#39;test&amp;#39;;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id87&#39;&gt;创建表&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;CREATE SCHEMA testdb DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id88&#39;&gt;赋予数据库权限&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;GRANT ALL ON testdb.* TO &amp;#39;test&amp;#39;@&amp;#39;localhost&amp;#39;;&lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>2014阅读书单</title>
+        <link>http://localhost:4000/2014/03/14/book-list-of-2014.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/03/14/book-list-of-2014.html</guid>
+        <pubDate>2014-03-14 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;web&#39;&gt;Web前端黑客技术揭秘&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;status: 已读&lt;/li&gt;
+
+&lt;li&gt;author: 钟晨鸣/徐少培&lt;/li&gt;
+
+&lt;li&gt;publisher: 电子工业出版社&lt;/li&gt;
+
+&lt;li&gt;language: 中文&lt;/li&gt;
+
+&lt;li&gt;link: http://book.douban.com/subject/20451827/&lt;/li&gt;
+
+&lt;li&gt;cover: http://img3.douban.com/lpic/s24562945.jpg&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#39;the_little_redis_book&#39;&gt;The Little Redis Book&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;status: 已读&lt;/li&gt;
+
+&lt;li&gt;author: Karl Seguin&lt;/li&gt;
+
+&lt;li&gt;publisher: Github&lt;/li&gt;
+
+&lt;li&gt;language: English&lt;/li&gt;
+
+&lt;li&gt;link: https://github.com/karlseguin/the-little-redis-book&lt;/li&gt;
+
+&lt;li&gt;cover: https://raw.githubusercontent.com/karlseguin/the-little-redis-book/master/en/title.png&lt;/li&gt;
+
+&lt;li&gt;description:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#39;facebook&#39;&gt;打造Facebook&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;status: 已读&lt;/li&gt;
+
+&lt;li&gt;author: 王淮/祝文让&lt;/li&gt;
+
+&lt;li&gt;publisher: 印刷工业出版社&lt;/li&gt;
+
+&lt;li&gt;language: 中文&lt;/li&gt;
+
+&lt;li&gt;link: http://book.douban.com/subject/20471120/&lt;/li&gt;
+
+&lt;li&gt;cover: http://img3.douban.com/lpic/s24581301.jpg&lt;/li&gt;
+
+&lt;li&gt;description:&lt;/li&gt;
+&lt;/ul&gt;</description>
+      </item>
+    
+      <item>
+        <title>SVN 常用资源</title>
+        <link>http://localhost:4000/2014/01/15/general-svn-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/01/15/general-svn-resources.html</guid>
+        <pubDate>2014-01-15 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id66&#39;&gt;常用指令&lt;/h2&gt;
+
+&lt;h3 id=&#39;checkout&#39;&gt;将文件checkout到本地目录&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn checkout path（path是服务器上的目录）
+svn checkout svn://192.168.1.1/pro/domain
+svn co&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id67&#39;&gt;往版本库中添加新的文件&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn add file
+svn add test.php(添加test.php)
+svn add *.php(添加当前目录下所有的php文件)
+svn add *.php --force(增加所有文件)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id68&#39;&gt;将改动的文件提交到版本库&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn commit -m “LogMessage“ [-N] [--no-unlock] PATH(如果选择了保持锁，就使用–no-unlock开关)
+svn commit -m “add test file for my test“ test.php
+svn ci&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id69&#39;&gt;加锁/解锁&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn lock -m “LockMessage“ [--force] PATH
+svn lock -m “lock test file“ test.php
+svn unlock PATH&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id70&#39;&gt;更新到某个版本&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn update -r m path
+svn update 如果后面没有目录，默认将当前目录以及子目录下的所有文件都更新到最新版本。
+svn update -r 200 test.php(将版本库中的文件test.php还原到版本200)
+
+svn update test.php(更新，于版本库同步。如果在提交的时候提示过期的话，是因为冲突，需要先update，修改文件，然后清除svn resolved，最后再提交commit)
+
+svn up&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id71&#39;&gt;查看文件或者目录状态&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn status path（目录下的文件和子目录的状态，正常状态不显示）
+【?：不在svn的控制中；M：内容被修改；C：发生冲突；A：预定加入到版本库；K：被锁定】
+
+svn status -v path(显示文件和子目录状态)
+第一列保持相同，第二列显示工作版本号，第三和第四列显示最后一次修改的版本号和修改人。
+
+注：svn status、svn diff和 svn revert这三条命令在没有网络的情况下也可以执行的，原因是svn在本地的.svn中保留了本地版本的原始拷贝。
+
+svn st&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id72&#39;&gt;删除文件&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn delete path -m “delete test fle“
+svn delete svn://192.168.1.1/pro/domain/test.php -m “delete test file”
+或者直接svn delete test.php 然后再svn ci -m ‘delete test file‘，推荐使用这种
+svn (del, remove, rm)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id73&#39;&gt;查看日志&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn log path 
+svn log test.php 显示这个文件的所有修改记录，及其版本号的变化&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id74&#39;&gt;查看文件详细信息&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn info path
+svn info test.php&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id75&#39;&gt;比较差异&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn diff path(将修改的文件与基础版本比较)
+svn diff test.php
+svn diff -r m:n path(对版本m和版本n比较差异)
+svn diff -r 200:201 test.php
+svn di&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id76&#39;&gt;将两个版本之间的差异合并到当前文件&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn merge -r m:n path
+svn merge -r 200:205 test.php（将版本200与205之间的差异合并到当前文件，但是一般都会产生冲突，需要处理一下）&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;svn_&#39;&gt;SVN 帮助&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn help
+svn help ci&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id77&#39;&gt;版本库下的文件和目录列表&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn list path 
+svn ls&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id78&#39;&gt;创建纳入版本控制下的新目录&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn mkdir: 创建纳入版本控制下的新目录。
+mkdir PATH…
+mkdir URL…
+
+创建版本控制的目录。
+
+1、每一个以工作副本 PATH 指定的目录，都会创建在本地端，并且加入新增调度，以待下一次的提交。
+2、每个以URL指定的目录，都会透过立即提交于仓库中创建.在这两个情况下，所有的中间目录都必须事先存在。&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id79&#39;&gt;恢复本地修改&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn revert: 恢复原始未改变的工作副本文件 (恢复大部份的本地修改)。revert:
+用法: revert PATH…
+注意: 本子命令不会存取网络，并且会解除冲突的状况。但是它不会恢复被删除的目录&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;url&#39;&gt;代码库URL变更&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn switch (sw): 更新工作副本至不同的URL。 
+
+1、switch URL [PATH]
+2、switch –relocate FROM TO [PATH...]
+1、更新你的工作副本，映射到一个新的URL，其行为跟“svn update”很像，也会将服务器上文件与本地文件合并。这是将工作副本对应到同一仓库中某个分支或者标记的方法。
+
+2、改写工作副本的URL元数据，以反映单纯的URL上的改变。当仓库的根URL变动(比如方案名或是主机名称变动)，但是工作副本仍旧对映到同一仓库的同一目录时使用这个命令更新工作副本与仓库的对应关系。&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id80&#39;&gt;解决冲突&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn resolved: 移除工作副本的目录或文件的“冲突”状态。 java设计模式之——策略模式
+用法: resolved PATH…
+注意: 本子命令不会依语法来解决冲突或是移除冲突标记；它只是移除冲突的相关文件，然后让 PATH 可以再次提交。&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;url&#39;&gt;输出指定文件或URL的内容。&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;svn cat 目标[@版本]…如果指定了版本，将从指定的版本开始查找。
+svn cat -r PREV filename &amp;gt; filename (PREV 是上一版本,也可以写具体版本号,这样输出结果是可以提交的)&lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>Shell 常用资源</title>
+        <link>http://localhost:4000/2014/01/15/general-shell-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/01/15/general-shell-resources.html</guid>
+        <pubDate>2014-01-15 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id46&#39;&gt;常用指令&lt;/h2&gt;
+
+&lt;h3 id=&#39;id47&#39;&gt;文本内容搜索&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;grep aaa * &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id48&#39;&gt;文件夹操作&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;查看文件夹大小   du -h --max-depth=1 /home/ys
+查看驱动器空间   df -h &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id49&#39;&gt;压缩命令&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;tar zxvf aaa.tar.gz
+tar zcvf aaa.tar.gz aaa&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id50&#39;&gt;登陆到其他用户&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;login&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id51&#39;&gt;查看端口的占用&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;lsof -i:8087  查看8087端口的使用&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id52&#39;&gt;批量杀死进程&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;ps -aux|grep name|grep -v grep|cut -c 9-15|xargs kill -9&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id53&#39;&gt;查看当前时间&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;date       时间
+date +%s   时间戳
+date -d &amp;quot;2010-07-20 10:25:30&amp;quot; +%s  指定时间时间戳
+date -d &amp;quot;@1279592730&amp;quot;    时间戳转时间
+date -d &amp;quot;1970-01-01 14781 days&amp;quot; &amp;quot;+%Y/%m/%d %H:%M:%S&amp;quot; &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id54&#39;&gt;查看进程内存使用情况&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;top -d 1 -p pid [,pid ...]
+pmap pid 
+ps aux|grep process_name
+查看/proc/process_id/文件夹下的status文件&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;linux&#39;&gt;查看Linux内核版本或发布版本&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;lsb_release -a
+uname -a&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;http&#39;&gt;一句话实现一个HTTP服务，把当前文件夹作为根目录&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;python -m SimpleHTTPServer&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id55&#39;&gt;查看本地网络服务活动状态&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;lsof -i&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;ip&#39;&gt;查看自己的外网ip&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;curl ifconfig.me&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id56&#39;&gt;下载整个网站&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;wget --random-wait -r -p -e robots=off -U mozilla http://www.example.com&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id57&#39;&gt;后台运行一段不中止的程序，并可随时查看它的状态&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;screen -d -m -S some_ name ping my_router&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id58&#39;&gt;查看进程执行的时间&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;ps -A -opid,stime,etime,args | grep python&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id59&#39;&gt;创建守护进程&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;nohup python /var/www/a.py &amp;amp;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id60&#39;&gt;查看当前文件夹下文件（文件夹）大小&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;du -h --max-depth=1 .&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id61&#39;&gt;查看所有磁盘大小&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;df -h&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id62&#39;&gt;诊断网络&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;mtr 
+ping
+traceroute
+dig&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id63&#39;&gt;列出本机监听的端口号&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;netstat –tlnp
+netstat -anop&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id64&#39;&gt;在远程机器上运行一段脚本&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;ssh user@server bash &amp;lt; /path/to/local/script.sh&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id65&#39;&gt;端口扫描&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;nc -z -v -n 127.0.0.1 20-100&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;30google20&#39;&gt;负载测试，30秒内向Google发起20个并发连接&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;siege -c20 www.google.co.uk -b -t30s&lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>Python 常用资源</title>
+        <link>http://localhost:4000/2014/01/15/general-python-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/01/15/general-python-resources.html</guid>
+        <pubDate>2014-01-15 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id39&#39;&gt;常用代码&lt;/h2&gt;
+
+&lt;h3 id=&#39;id40&#39;&gt;遍历对象&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;for key in a.__dict__:
+    print key,&amp;#39;:&amp;#39;,a.__dict__[key]&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id41&#39;&gt;调试方法&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;assert False   //引发异常，观察错误界面
+import logging
+logging.info(&amp;#39;&amp;#39;)  //写日志&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id42&#39;&gt;获得当前时间&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;#时间戳
+time.time()
+#日期时间
+time.ctime()
+#iso时间
+datetime.fromtimestamp(time.time()).isoformat()
+#固定格式
+time.strftime(&amp;#39;%Y-%m-%d&amp;#39;,time.localtime(time.time()))&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id43&#39;&gt;日期到时间戳&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;dateC=datetime.datetime(2010,6,6,8,14,59)
+timestamp=time.mktime(dateC.timetuple())&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id44&#39;&gt;时间戳到日期&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;ltime=time.localtime(1237515355.0)
+timeStr=time.strftime(&amp;quot;%Y-%m-%d %H:%M:%S&amp;quot;, ltime)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#39;id45&#39;&gt;之后的包从绝对位置导入&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;from __future__ import absolute_import&lt;/code&gt;&lt;/pre&gt;</description>
+      </item>
+    
+      <item>
+        <title>PHP 常用资源</title>
+        <link>http://localhost:4000/2014/01/15/general-php-resources.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/01/15/general-php-resources.html</guid>
+        <pubDate>2014-01-15 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&#39;id33&#39;&gt;常用资源&lt;/h2&gt;
+
+&lt;h3 id=&#39;id34&#39;&gt;常用扩展&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#39;http://www.phpdoc.org&#39;&gt;phpDocumentor&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;https://phpunit.de&#39;&gt;PHPUnit&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;https://github.com/guzzle/guzzle&#39;&gt;Guzzle&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#39;id35&#39;&gt;好文&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#39;http://wulijun.github.io/php-the-right-way/&#39;&gt;PHP之道&lt;/a&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;a href=&#39;http://blog.csdn.net/fangaoxin/article/details/6952954&#39;&gt;Cookie/Session机制详解&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#39;id36&#39;&gt;优秀的类库&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#39;http://jingwentian.com/t-145&#39;&gt;PHP中文分词: 自动打标签功能&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#39;id37&#39;&gt;判断是否为空&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;
++--------------+-----------+---------+-----------+---------+--------+
+| 真值表        | gettype() | empty() | is_null() | isset() | (bool) |
++--------------+-----------+---------+-----------+---------+--------+
+| $x = &amp;quot;&amp;quot;      | string    | true    | false     | true    | false  |
+| $x=null      | NULL      | true    | true      | false   | false  |
+| var $x       | NULL      | true    | true      | false   | false  |
+| $x = array() | array     | true    | false     | true    | false  |
+| $x = false   | boolean   | true    | false     | true    | false  |
+| $x = 15      | integer   | false   | false     | true    | true   |
+| $x = 1       | integer   | false   | false     | true    | true   |
+| $x = 0       | integer   | true    | false     | true    | false  |
+| $x = -1      | integer   | false   | false     | true    | true   |
+| $x = &amp;#39;15&amp;#39;    | string    | false   | false     | true    | true   |
+| $x = &amp;#39;1&amp;#39;     | string    | false   | false     | true    | true   |
+| $x = &amp;#39;0&amp;#39;     | string    | true    | false     | true    | false  |
+| $x = &amp;#39;-1&amp;#39;    | string    | false   | false     | true    | true   |
+| $x = &amp;#39;foo&amp;#39;   | string    | false   | false     | true    | true   |
+| $x = &amp;#39;true&amp;#39;  | string    | false   | false     | true    | true   |
+| $x = &amp;#39;false&amp;#39; | string    | false   | false     | true    | true   |
++--------------+-----------+---------+-----------+---------+--------+
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&#39;id38&#39;&gt;常用命令&lt;/h2&gt;
+
+&lt;h3 id=&#39;phpunit&#39;&gt;修改phpunit内存限制&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;phpunit -d memory_limit=512M&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#39;phpstorm_&#39;&gt;PHPStorm 常用快捷键&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Quick Command&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Command + Shift + A&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;Quick File&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Command + Shift + O&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;Quick Class&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Command + O&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;Quick Symbol&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Command + Option + O&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description>
+      </item>
+    
+  </channel>
+</rss>

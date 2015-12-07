@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
+
+<title>ios中经常使用的代码片段 | 尹亚坤的博客</title>
+<meta name="author" content="尹亚坤">
+
+
+
+  <meta name="description " content="ios 开发过程中经常使用到的代码片段.">
+
+
+<link rel="shortcut icon" href="http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg" />
+
+<link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+
+<link href="/pages/rss.xml" rel="alternate" title="尹亚坤的博客" type="application/atom+xml">
+  </head>
+  <body>
+    <aside id="sidebar">
+  <nav id="tags">
+    <a href="/index.html" id="avatar" style="background-image:url(http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg)"></a>
+
+    <ul id="tags__ul">
+      <li id="pl__all" class="tags__li tags-btn active">全部</li>
+       
+        <li id="技术" class="tags__li tags-btn">技术</li>
+       
+        <li id="资源" class="tags__li tags-btn">资源</li>
+       
+        <li id="生活" class="tags__li tags-btn">生活</li>
+       
+        <li id="读书" class="tags__li tags-btn">读书</li>
+      
+    </ul>
+
+    <div id="tags__bottom">
+      <a href="mailto:yinyakun123@126.com" id="icon-email" class="tags-btn fontello"></a>
+      <a href="/pages/rss.xml" id="icon-feed" class="tags-btn fontello"></a>
+    </div>
+  </nav> <!-- end #tags -->
+
+  <div id="posts-list">
+    <form action="" id="search-form">
+      <a href="/index.html" id="mobile-avatar" style="background-image:url(http://ww1.sinaimg.cn/large/7f5ba233gw1exmmqayproj20u00k00wr.jpg)"></a>
+      <!-- NOTE: input field is disabled by default -->
+      <input id="search-input" type="text" placeholder="Search..." disabled >
+    </form>
+
+    <nav id="pl__container">
+    
+      <a class="技术 pl__all" href="/2015/11/17/coredata-sample.html"><span class="pl__circle"></span><span class="pl__title">CoreData 技术</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="生活 pl__all" href="/2015/11/13/%E5%B7%A5%E4%BD%9C%E7%82%B9%E6%BB%B4.html"><span class="pl__circle"></span><span class="pl__title">工作中的点滴.</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/09/GCD_%E7%B3%BB%E5%88%97.html"><span class="pl__circle"></span><span class="pl__title">iOS GCD 技术系列1</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/02/%E6%8F%90%E4%BA%A4%E4%BA%BA.html"><span class="pl__circle"></span><span class="pl__title">测试</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/02/%E5%A4%9A%E6%80%81.html"><span class="pl__circle"></span><span class="pl__title">多态</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/02/utils-part-coding.html"><span class="pl__circle"></span><span class="pl__title">ios中经常使用的代码片段</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/02/c%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0..html"><span class="pl__circle"></span><span class="pl__title">C 语言基础</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="生活 pl__all" href="/2015/11/01/%E7%94%9F%E6%B4%BB.html"><span class="pl__circle"></span><span class="pl__title">生活第一篇</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/01/markdown_%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html"><span class="pl__circle"></span><span class="pl__title">markdown 经常使用的命令</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/01/mac_%E4%B8%8B%E5%B8%B8%E4%BD%BF%E7%94%A8%E7%9A%84%E7%BB%88%E7%AB%AF%E5%91%BD%E4%BB%A4.html"><span class="pl__circle"></span><span class="pl__title">mac 常用命令</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="技术 pl__all" href="/2015/11/01/create-frame-work.html"><span class="pl__circle"></span><span class="pl__title">如何创建自己的frmawork</span><span class="pl__date">Nov 2015</span></a>
+    
+      <a class="资源 pl__all" href="/2015/10/04/general-vim-resources.html"><span class="pl__circle"></span><span class="pl__title">Vim 常用资源</span><span class="pl__date">Oct 2015</span></a>
+    
+      <a class="资源 pl__all" href="/2015/02/13/general-seo-resources.html"><span class="pl__circle"></span><span class="pl__title">SEO 常用资源</span><span class="pl__date">Feb 2015</span></a>
+    
+      <a class="资源 pl__all" href="/2014/08/03/general-mac-resources.html"><span class="pl__circle"></span><span class="pl__title">Mac 常用资源</span><span class="pl__date">Aug 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/05/11/general-mysql-resources.html"><span class="pl__circle"></span><span class="pl__title">MySQL常用资源</span><span class="pl__date">May 2014</span></a>
+    
+      <a class="读书 pl__all" href="/2014/03/14/book-list-of-2014.html"><span class="pl__circle"></span><span class="pl__title">2014阅读书单</span><span class="pl__date">Mar 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-svn-resources.html"><span class="pl__circle"></span><span class="pl__title">SVN 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-shell-resources.html"><span class="pl__circle"></span><span class="pl__title">Shell 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-python-resources.html"><span class="pl__circle"></span><span class="pl__title">Python 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-php-resources.html"><span class="pl__circle"></span><span class="pl__title">PHP 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-jquery-resources.html"><span class="pl__circle"></span><span class="pl__title">jQuery 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-javascript-resources.html"><span class="pl__circle"></span><span class="pl__title">JavaScript 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-html-resources.html"><span class="pl__circle"></span><span class="pl__title">HTML 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="资源 pl__all" href="/2014/01/15/general-git-resources.html"><span class="pl__circle"></span><span class="pl__title">Git 常用资源</span><span class="pl__date">Jan 2014</span></a>
+    
+      <a class="生活 pl__all" href="/2013/08/01/the-importent-of-writing.html"><span class="pl__circle"></span><span class="pl__title">持续写作的重要性</span><span class="pl__date">Aug 2013</span></a>
+    
+      <a class="资源 pl__all" href="/2013/04/23/general-bootstrap-resources.html"><span class="pl__circle"></span><span class="pl__title">Bootstrap常用资源</span><span class="pl__date">Apr 2013</span></a>
+    
+      <a class="技术 pl__all" href="/2012/09/19/php-session-security.html"><span class="pl__circle"></span><span class="pl__title">PHP操作Session的原理及提升安全性时的一个问题</span><span class="pl__date">Sep 2012</span></a>
+    
+    </nav>
+  </div> <!-- end #posts-list -->
+</aside> <!-- end #sidebar -->
+    <div id="post">
+      <div id="pjax">
+        <article id="post__content">
+  <h1 id="post__title" data-identifier="20151102">ios中经常使用的代码片段</h1>
+  <h3 id='event_tableview_cell'>通过event 找到tableview 上的某一个cell</h3>
+
+<pre><code>	-(void)didclickBtn_edit:(UIButton *)sender event:(UIEvent *)event
+
+		{
+
+UITouch *touch = [[event allTouches] anyObject];
+
+CGPoint currentTouchPosition = [touch locationInView:self.tableview_showdata];
+
+NSIndexPath *indexPath = [self.tableview_showdata indexPathForRowAtPoint: currentTouchPosition];
+
+if (indexPath != nil)
+
+{
+
+    NSLog(@&quot;%ld,%ld&quot;,indexPath.row,indexPath.section);
+
+}
+}
+}</code></pre>
+
+<ul>
+<li>
+<h2 id='window_'>获取window 上当前最上面的控制器</h2>
+
+<p>//获取当前屏幕显示的viewcontroller</p>
+
+<p>- (UIViewController <em>)getCurrentVC { UIViewController</em>result = nil;</p>
+
+<pre><code>	 UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    if (window.windowLevel != UIWindowLevelNormal)
+ 	 {
+      	NSArray *windows = [[UIApplication sharedApplication] windows];
+    	  for(UIWindow * tmpWin in windows)
+      	{
+          	if (tmpWin.windowLevel == UIWindowLevelNormal)
+         	 {
+            	  window = tmpWin;
+             	 break;
+      }
+  }</code></pre>
+
+<p>}</p>
+
+<p>UIView <em>frontView = <span><span>window subviews</span> objectAtIndex:0</span>; id nextResponder = <span>frontView nextResponder</span>;</em></p>
+
+<p>if (<span>nextResponder isKindOfClass:<span>UIViewController class</span></span>) result = nextResponder; else result = window.rootViewController;</p>
+
+<p>return result; }</p>
+</li>
+
+<li>
+<h2 id='view_'>自定义一个view ,自定义样式,这里举例,类似聊天的小泡</h2>
+
+<p><img alt='效果图' src='http://ww3.sinaimg.cn/large/7f5ba233gw1exmru8ng1jj20hq0vkdg6.jpg' /></p>
+</li>
+</ul>
+
+<p>实现代码:</p>
+
+<pre><code>#import &quot;YKPopView.h&quot;
+
+#define MENUGAP 7
+
+@implementation YKPopView
+
+-(instancetype)initWithFrame:(CGRect)frame {
+self = [super initWithFrame:frame];
+if (self) {
+    self.backgroundColor = [UIColor clearColor];
+}
+return self;
+}
+
+// Only override drawRect: if you perform custom drawing.
+	// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+// Drawing code
+CGFloat width = rect.size.width;
+CGFloat height = rect.size.height;
+CGFloat radius = 3;
+ 
+// 获取CGContext，注意UIKit里用的是一个专门的函数
+CGContextRef context = UIGraphicsGetCurrentContext();
+// 移动到初始点
+CGContextMoveToPoint(context, radius, MENUGAP);
+ 
+// 绘制第1条线和第1个1/4圆弧
+CGContextAddLineToPoint(context, width * 5/6 - 6,MENUGAP);
+CGContextAddLineToPoint(context, width * 5/6,0);
+CGContextAddLineToPoint(context, width  * 5/6 + 6,MENUGAP);
+CGContextAddLineToPoint(context, width - radius, MENUGAP);
+CGContextAddArc(context, width - radius, radius + MENUGAP, radius, -0.5 * M_PI, 0.0, 0);
+ 
+// 绘制第2条线和第2个1/4圆弧
+CGContextAddLineToPoint(context, width, height - radius - MENUGAP);
+CGContextAddArc(context, width - radius, height - radius - MENUGAP, radius, 0.0, 0.5 * M_PI, 0);
+ 
+// 绘制第3条线和第3个1/4圆弧
+CGContextAddLineToPoint(context, radius, height - MENUGAP);
+CGContextAddArc(context, radius, height - radius - MENUGAP, radius, 0.5 * M_PI, M_PI, 0);
+ 
+// 绘制第4条线和第4个1/4圆弧
+CGContextAddLineToPoint(context, 0, radius + MENUGAP);
+CGContextAddArc(context, radius, radius + MENUGAP, radius, M_PI, 1.5 * M_PI, 0);
+ 
+// 闭合路径
+CGContextClosePath(context);
+ 
+[[UIColor redColor] setFill];
+CGContextDrawPath(context, kCGPathFill);
+
+}</code></pre>
+
+<h2 id='_'>* 声音播放(播放背景音乐)</h2>
+
+<pre><code>#import&lt;AVFoundation/AVFoundation.h&gt;
+@interface HMViewController ()
+@property (nonatomic, assign) SystemSoundID soundID;
+@end
+
+@implementation HMViewController
+
+- (void)viewDidLoad
+{
+[super viewDidLoad];
+// 1.获得音效文件的全路径
+NSURL *url = [[NSBundle mainBundle] URLForResource:@&quot;normal.aac&quot; withExtension:nil];
+
+// 2.加载音效文件, 创建音效ID（SoundID）
+AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &amp;_soundID);
+
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+// 3.播放
+AudioServicesPlaySystemSound(_soundID);
+}
+
+@end</code></pre>
+
+<p>分三步:</p>
+
+<ol>
+<li>获取音效路径.NSURL * url;</li>
+
+<li>加载音效文件.AudioServicesCreateSystemSoundID()(_bridge CFURLRef)url, &amp;_soundID);</li>
+
+<li>播放 AudioServicesPlaySystemSound(_soundID);</li>
+</ol>
+
+<p>__ pod 卡到 cocospods老是卡在Analyzing dependencies~~ __</p>
+
+<p>更新的时候 试试用 : pod install &#8211;verbose &#8211;no-repo-update</p>
+
+<p>__ Unable to satisfy the following requirements解决方案 __</p>
+
+<p>如果使用 pod install 的时候报错:</p>
+
+<p><span>!</span> Unable to satisfy the following requirements:</p>
+
+<ul>
+<li><code>MJExtension</code> required by <code>Podfile</code></li>
+
+<li><code>MJExtension (= 2.4.4)</code> required by <code>Podfile.lock</code></li>
+</ul>
+
+<p>解决办法</p>
+
+<p>先 更新</p>
+
+<p>pod update &#8211;verbose &#8211;no-repo-update</p>
+
+<p>然后 再</p>
+
+<p>pod install &#8211;verbose &#8211;no-repo-update</p>
+
+<p>* 陆续进行补充&#8230;.</p>
+</article> <!-- end #post__content -->
+
+<div id="post__share">
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://localhost:4000/2015/11/02/utils-part-coding.html&text=ios中经常使用的代码片段" target="_blank"></a>
+  <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://localhost:4000/2015/11/02/utils-part-coding.html&title=ios中经常使用的代码片段" target="_blank"></a>
+</div> <!-- end #post__share -->
+<div id="disqus_thread" name="">
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink" target="_blank">Loading Disqus comments...</a>
+</div>
+
+
+        <p id="copyright">Powered by <a href="http://jekyllrb.com" target="_blank">Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Theme <a href="https://github.com/P233/3-Jekyll" target="_blank">3-Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Hosted on <a href="https://pages.github.com" target="_blank">Github</a></p>
+      </div> <!-- end #pjax -->
+
+      <div id="post__toc-trigger">
+        <div id="post__toc">
+          <span id="post__toc-title">Table of Contents</span>
+          <ul id="post__toc-ul"></ul>
+        </div>
+      </div>
+    </div> <!-- end #post -->
+
+    <button id="js-fullscreen"><span id="icon-arrow" class="fontello"></span></button>
+
+<script src="/assets/js/jquery.js"></script>
+<script src="/assets/js/jquery.pjax.js"></script>
+<script src="/assets/js/nprogress.js"></script>
+<script src="/assets/js/script.js"></script>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', '', '');
+  ga('send', 'pageview');
+</script>
+  </body>
+</html>

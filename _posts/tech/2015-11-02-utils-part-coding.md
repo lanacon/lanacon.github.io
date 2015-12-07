@@ -31,21 +31,21 @@ description: ios 开发过程中经常使用到的代码片段.
 ---
   		
 //获取当前屏幕显示的viewcontroller
-    
-    	    - (UIViewController *)getCurrentVC
-    	{
-    UIViewController *result = nil;
      
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal)
-    {
-        NSArray *windows = [[UIApplication sharedApplication] windows];
-        for(UIWindow * tmpWin in windows)
-        {
-            if (tmpWin.windowLevel == UIWindowLevelNormal)
-            {
-                window = tmpWin;
-                break;
+    - (UIViewController *)getCurrentVC
+    	{
+      	 UIViewController *result = nil;
+     
+      	 UIWindow * window = [[UIApplication sharedApplication] keyWindow];
+    	    if (window.windowLevel != UIWindowLevelNormal)
+       	 {
+            	NSArray *windows = [[UIApplication sharedApplication] windows];
+          	  for(UIWindow * tmpWin in windows)
+            	{
+                	if (tmpWin.windowLevel == UIWindowLevelNormal)
+               	 {
+                  	  window = tmpWin;
+                   	 break;
             }
         }
     }
@@ -158,8 +158,8 @@ description: ios 开发过程中经常使用到的代码片段.
 3. 播放 AudioServicesPlaySystemSound(_soundID);
 
 
-
-__ pod 卡到  cocospods老是卡在Analyzing dependencies~~ __
+_
+_ pod 卡到  cocospods老是卡在Analyzing dependencies~~ __
 
 更新的时候 试试用 :   pod install --verbose --no-repo-update 
 
