@@ -28,7 +28,8 @@ description: ios 开发过程中经常使用到的代码片段.
    	}
    	
 * 获取window 上当前最上面的控制器
----
+
+
   		
 //获取当前屏幕显示的viewcontroller
      
@@ -63,7 +64,8 @@ description: ios 开发过程中经常使用到的代码片段.
 
 
 * 自定义一个view ,自定义样式,这里举例,类似聊天的小泡
----
+
+
 ![效果图](http://ww3.sinaimg.cn/large/7f5ba233gw1exmru8ng1jj20hq0vkdg6.jpg)
 
 实现代码:
@@ -123,8 +125,8 @@ description: ios 开发过程中经常使用到的代码片段.
 	}
 	
 * 声音播放(播放背景音乐)
----
-	#import<AVFoundation/AVFoundation.h>
+
+	<code> #import<AVFoundation/AVFoundation.h>
 	@interface HMViewController ()
 	@property (nonatomic, assign) SystemSoundID soundID;
 	@end
@@ -158,17 +160,16 @@ description: ios 开发过程中经常使用到的代码片段.
 3. 播放 AudioServicesPlaySystemSound(_soundID);
 
 
-_
-_ pod 卡到  cocospods老是卡在Analyzing dependencies~~ __
+ pod 卡到  cocospods老是卡在Analyzing dependencies~~
 
 更新的时候 试试用 :   pod install --verbose --no-repo-update 
 
 
-__ Unable to satisfy the following requirements解决方案 __
+ Unable to satisfy the following requirements解决方案
 
 如果使用 pod install  的时候报错:
 
-[!] Unable to satisfy the following requirements:
+<code> [!] Unable to satisfy the following requirements:
 
 
 - `MJExtension` required by `Podfile`
